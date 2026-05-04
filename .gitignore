@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Build output
+client/dist/
+server/dist/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Uploads directory (files managed by the system)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Database
+*.sqlite
+*.sqlite3
+
+# Coverage
+coverage/
+
+# Prisma
+server/prisma/migrations/
+
+# Temporary files
+*.tmp
+*.temp

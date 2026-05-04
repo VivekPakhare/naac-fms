@@ -1,0 +1,210 @@
+import { useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { LogIn, Mail, Lock, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import toast from 'react-hot-toast';
+
+export default function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+
+  const [form, setForm] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+    setError('');
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    try {
+      const user = await login(form.email, form.password);
+      toast.success(`Welcome back, ${user.fullName}!`);
+
+      // Role-aware redirect
+      if (user.role === 'hod') {
+        navigate('/dashboard/hod', { replace: true });
+      } else {
+        navigate('/dashboard/teacher', { replace: true });
+      }
+    } catch (err) {
+      const message = err.response?.data?.message || 'Login failed. Please try again.';
+      setError(message);
+      toast.error(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left — Branding Panel */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 items-center justify-center p-12">
+        {/* Decorative circles */}
+        <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-600/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-[-15%] right-[-10%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-3xl" />
+
+        <div className="relative z-10 max-w-lg">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+              <span className="text-white font-bold text-lg">N</span>
+            </div>
+            <div>
+              <h2 className="text-white font-bold text-xl tracking-tight">NAAC FMS</h2>
+              <p className="text-indigo-300 text-xs">File Management System</p>
+            </div>
+          </div>
+
+          <h1 className="text-4xl font-extrabold text-white mb-4 leading-tight">
+            Manage Your<br />
+            <span className="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-transparent">
+              Accreditation Files
+            </span><br />
+            Digitally.
+          </h1>
+          <p className="text-slate-400 text-lg leading-relaxed">
+            A streamlined portal for Indian colleges to manage NAAC documentation — 
+            7 criteria, 20+ sub-criteria, and 34+ required documents in one place.
+          </p>
+
+          <div className="mt-10 flex gap-6">
+            <div className="text-center">
+              <div className="text-2xl font-bold text-indigo-400">7</div>
+              <div className="text-xs text-slate-500 mt-1">Criteria</div>
+            </div>
+            <div className="w-px bg-slate-700" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-purple-400">20+</div>
+              <div className="text-xs text-slate-500 mt-1">Sub-Criteria</div>
+            </div>
+            <div className="w-px bg-slate-700" />
+            <div className="text-center">
+              <div className="text-2xl font-bold text-cyan-400">34+</div>
+              <div className="text-xs text-slate-500 mt-1">Documents</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right — Login Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12 bg-slate-950">
+        <div className="w-full max-w-md">
+          {/* Mobile logo */}
+          <div className="lg:hidden flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+              <span className="text-white font-bold">N</span>
+            </div>
+            <h2 className="text-white font-bold text-lg">NAAC FMS</h2>
+          </div>
+
+          <h2 className="text-2xl font-bold text-white mb-2">Welcome back</h2>
+          <p className="text-slate-400 mb-8">Enter your credentials to access your dashboard.</p>
+
+          {error && (
+            <div className="flex items-center gap-3 p-4 mb-6 bg-red-500/10 border border-red-500/20 rounded-xl text-red-400 text-sm">
+              <AlertCircle className="w-5 h-5 shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Email */}
+            <div>
+              <label htmlFor="login-email" className="block text-sm font-medium text-slate-300 mb-2">
+                Email Address
+              </label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  id="login-email"
+                  name="email"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="your.email@college.edu"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                />
+              </div>
+            </div>
+
+            {/* Password */}
+            <div>
+              <label htmlFor="login-password" className="block text-sm font-medium text-slate-300 mb-2">
+                Password
+              </label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+                <input
+                  id="login-password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  autoComplete="current-password"
+                  value={form.password}
+                  onChange={handleChange}
+                  placeholder="••••••••"
+                  className="w-full pl-12 pr-12 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+
+            {/* Submit */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-3 px-6 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-xl hover:from-indigo-500 hover:to-purple-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-slate-950 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-indigo-500/25"
+            >
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <LogIn className="w-5 h-5" />
+                  Sign In
+                </>
+              )}
+            </button>
+          </form>
+
+          {/* Register link */}
+          <p className="mt-8 text-center text-slate-400 text-sm">
+            Don't have an account?{' '}
+            <Link to="/register" className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+              Register as Teacher
+            </Link>
+          </p>
+
+          {/* Demo credentials */}
+          <div className="mt-8 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
+            <p className="text-xs text-slate-500 mb-3 font-medium uppercase tracking-wider">Demo Credentials</p>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between text-slate-400">
+                <span>HOD:</span>
+                <span className="font-mono text-slate-300">hod@naac.edu / HOD@2024</span>
+              </div>
+              <div className="flex justify-between text-slate-400">
+                <span>Teacher:</span>
+                <span className="font-mono text-slate-300">anita.sharma@naac.edu / Teacher@123</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

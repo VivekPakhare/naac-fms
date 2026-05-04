@@ -1,0 +1,19 @@
+{
+  "name": "naac-file-management-system",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NAAC File Management System — A web portal for Indian colleges to manage NAAC accreditation documentation digitally.",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "build:client": "cd client && npm run build",
+    "lint": "cd client && npm run lint"
+  },
+  "keywords": ["naac", "accreditation", "college", "document-management"],
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
