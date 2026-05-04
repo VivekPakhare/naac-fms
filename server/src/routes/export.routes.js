@@ -1,16 +1,16 @@
 const express = require('express');
 const router = express.Router();
+const exportController = require('../controllers/export.controller');
+const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
 
-// ── Export Routes (to be implemented) ────────────────────
-// GET /api/export/pdf/:criterionId    — Export criterion data as PDF
-// GET /api/export/excel/:criterionId  — Export criterion data as Excel
+// All export routes require authentication
+router.use(authenticateToken);
 
-router.get('/pdf/:criterionId', (_req, res) => {
-  res.status(501).json({ message: 'Export PDF — not implemented yet' });
-});
+// Teacher exports
+router.get('/pdf', exportController.exportPdf);
+router.get('/excel', exportController.exportExcel);
 
-router.get('/excel/:criterionId', (_req, res) => {
-  res.status(501).json({ message: 'Export Excel — not implemented yet' });
-});
+// HOD consolidated export
+router.get('/consolidated', requireRole('hod'), exportController.exportConsolidated);
 
 module.exports = router;

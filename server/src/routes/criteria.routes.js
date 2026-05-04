@@ -1,21 +1,12 @@
 const express = require('express');
 const router = express.Router();
+const criteriaController = require('../controllers/criteria.controller');
+const { authenticateToken } = require('../middleware/auth.middleware');
 
-// ── Criteria Routes (to be implemented) ──────────────────
-// GET  /api/criteria           — List all 7 criteria
-// GET  /api/criteria/:id       — Get criterion with sub-criteria
-// GET  /api/criteria/:id/sub   — Get sub-criteria for a criterion
+// GET /api/criteria — List all 7 criteria with sub-criteria
+router.get('/', authenticateToken, criteriaController.listCriteria);
 
-router.get('/', (_req, res) => {
-  res.status(501).json({ message: 'List criteria — not implemented yet' });
-});
-
-router.get('/:id', (_req, res) => {
-  res.status(501).json({ message: 'Get criterion — not implemented yet' });
-});
-
-router.get('/:id/sub', (_req, res) => {
-  res.status(501).json({ message: 'Get sub-criteria — not implemented yet' });
-});
+// GET /api/criteria/:id — Get single criterion with sub-criteria
+router.get('/:id', authenticateToken, criteriaController.getCriterion);
 
 module.exports = router;

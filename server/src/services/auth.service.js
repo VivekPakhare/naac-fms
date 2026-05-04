@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { prisma } = require('../config/db');
 const { JWT_SECRET, JWT_EXPIRES_IN } = require('../config/jwt');
+const { checkDeadlineNotifications } = require('../controllers/notification.controller');
 
 const SALT_ROUNDS = 12;
 
@@ -75,6 +76,8 @@ async function loginUser({ email, password }) {
     where: { email },
   });
 
+  console.log(`[AUTH] Login attempt for: ${email} — User found: ${!!user}`);
+
   if (!user) {
     const error = new Error('Invalid email or password.');
     error.status = 401;
@@ -82,6 +85,7 @@ async function loginUser({ email, password }) {
   }
 
   if (!user.isActive) {
+    console.log(`[AUTH] Account deactivated: ${email}`);
     const error = new Error('Account has been deactivated. Contact the administrator.');
     error.status = 403;
     throw error;
@@ -89,13 +93,25 @@ async function loginUser({ email, password }) {
 
   // Verify password
   const isMatch = await bcrypt.compare(password, user.passwordHash);
+  console.log(`[AUTH] Password match for ${email}: ${isMatch}`);
+
   if (!isMatch) {
     const error = new Error('Invalid email or password.');
     error.status = 401;
     throw error;
   }
 
+  // Update last login timestamp
+  await prisma.user.update({
+    where: { id: user.id },
+    data: { lastLoginAt: new Date() },
+  });
+
   const token = generateToken(user);
+  console.log(`[AUTH] JWT generated for ${email} (${user.role})`);
+
+  // Check deadline-based notifications (non-blocking)
+  checkDeadlineNotifications(user.id).catch(() => {});
 
   // Return user without passwordHash
   const { passwordHash, ...userWithoutPassword } = user;

@@ -1,189 +1,225 @@
-# NAAC File Management System
+# NAAC File Management System (FMS)
 
-A web portal for Indian colleges to manage NAAC accreditation documentation digitally.
+A comprehensive web-based document management system for NAAC (National Assessment and Accreditation Council) accreditation preparation. The system enables teachers to submit criterion-wise data and documents, while HODs can review, verify, and export consolidated reports for institutional accreditation.
 
-## 🏗️ Project Structure
+## Tech Stack
 
-```
-inovatex/
-├── client/                     # React frontend (Vite + Tailwind CSS v4)
-│   ├── src/
-│   │   ├── components/         # Reusable UI components
-│   │   ├── layouts/            # Layout wrappers (Sidebar, Header, etc.)
-│   │   ├── pages/              # Page-level components
-│   │   ├── services/
-│   │   │   └── api.js          # Axios instance with JWT interceptors
-│   │   ├── App.jsx             # Root component
-│   │   ├── App.css
-│   │   ├── index.css           # Tailwind CSS entry
-│   │   └── main.jsx            # React entry point
-│   ├── vite.config.js          # Vite config with Tailwind + API proxy
-│   └── package.json
-│
-├── server/                     # Express.js backend
-│   ├── prisma/
-│   │   ├── schema.prisma       # Database schema (User, Criterion, etc.)
-│   │   └── seed.js             # Seed script for initial data
-│   ├── src/
-│   │   ├── config/
-│   │   │   ├── db.js           # Prisma PostgreSQL connection
-│   │   │   ├── jwt.js          # JWT configuration
-│   │   │   └── multer.js       # File upload configuration
-│   │   ├── controllers/        # Route handler logic
-│   │   ├── middleware/
-│   │   │   └── auth.middleware.js  # JWT verify + role authorization
-│   │   ├── routes/             # Express route definitions
-│   │   │   ├── auth.routes.js
-│   │   │   ├── criteria.routes.js
-│   │   │   ├── upload.routes.js
-│   │   │   └── export.routes.js
-│   │   ├── services/           # Business logic layer
-│   │   └── index.js            # Express entry point
-│   ├── uploads/                # File storage directory
-│   ├── .env.example
-│   └── package.json
-│
-├── .env.example                # Root environment template
-├── .gitignore
-├── package.json                # Root scripts (concurrently)
-└── README.md
-```
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| Frontend | React + Vite | React 19, Vite 8 |
+| Styling | Tailwind CSS | v4 |
+| Backend | Express.js | v5 |
+| Database | PostgreSQL | v14+ |
+| ORM | Prisma | v6 |
+| Auth | JWT (jsonwebtoken) | bcryptjs |
+| Export | ExcelJS (xlsx), Puppeteer (PDF) |
+| Security | Helmet, express-rate-limit, xss-filters |
 
-## 🛠️ Tech Stack
+## Prerequisites
 
-| Layer          | Technology                          |
-| -------------- | ----------------------------------- |
-| Frontend       | React.js + Vite + Tailwind CSS v4   |
-| Backend        | Node.js + Express.js                |
-| Database       | PostgreSQL                          |
-| ORM            | Prisma                              |
-| Authentication | JWT + bcrypt                        |
-| File Uploads   | Multer (local filesystem)           |
-| PDF Export     | Puppeteer                           |
-| Excel Export   | ExcelJS                             |
-| HTTP Client    | Axios                               |
+- **Node.js** v18+ (v20 LTS recommended)
+- **PostgreSQL** v14+ (or use embedded-postgres for development)
+- **npm** v9+
 
-## 📋 Prerequisites
+## Quick Start
 
-- **Node.js** v18+ and npm
-- **PostgreSQL** v14+ running locally or remotely
-
-## 🚀 Getting Started
-
-### 1. Clone & Install
-
+### 1. Clone the repository
 ```bash
-git clone <repo-url> inovatex
-cd inovatex
-
-# Install all dependencies (root + client + server)
-npm run install:all
+git clone <repository-url>
+cd naac-fms
 ```
 
-### 2. Configure Environment Variables
-
+### 2. Install dependencies
 ```bash
-# Copy the template
-cp server/.env.example server/.env
+# Root dependencies (concurrently)
+npm install
 
-# Edit server/.env with your values:
-#   DATABASE_URL=postgresql://username:password@localhost:5432/naac_db
-#   JWT_SECRET=<generate-a-strong-secret>
+# Server dependencies
+cd server && npm install
+
+# Client dependencies
+cd ../client && npm install
+cd ..
 ```
 
-### 3. Set Up the Database
-
+### 3. Configure environment
 ```bash
-# Create the PostgreSQL database
-createdb naac_db
+cp .env.example server/.env
+# Edit server/.env with your database credentials
+```
 
-# Run Prisma migrations to create tables
+### 4. Database setup
+```bash
 cd server
-npx prisma migrate dev --name init
 
-# Generate the Prisma client
+# Option A: Use embedded PostgreSQL (recommended for development)
+node start-dev.js
+# This auto-creates the DB, pushes schema, seeds data, and starts the server.
+
+# Option B: Use external PostgreSQL
+npx prisma db push
 npx prisma generate
-
-# Seed initial data (admin user + 7 NAAC criteria)
-npm run seed
+node database/seed.js
+npm start
 ```
 
-**Default admin credentials after seeding:**
-- Email: `admin@naac.edu`
-- Password: `admin123`
-
-### 4. Run the Development Servers
-
+### 5. Start development servers
 ```bash
-# From root — starts both client (port 5173) and server (port 5000)
+# From root directory — starts both client and server
 npm run dev
+
+# Or individually:
+cd server && node start-dev.js    # Backend: http://localhost:5000
+cd client && npm run dev          # Frontend: http://localhost:5173
 ```
 
-Or run them separately:
+## Default Login Credentials
+
+| Role | Email | Password |
+|------|-------|----------|
+| **HOD** | hod@naac.edu | HOD@2024 |
+| Teacher 1 | anita.sharma@naac.edu | Teacher@123 |
+| Teacher 2 | vikram.patel@naac.edu | Teacher@123 |
+| Teacher 3 | meera.desai@naac.edu | Teacher@123 |
+
+## API Endpoints
+
+### Authentication
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/auth/register` | Register new teacher | No |
+| POST | `/api/auth/login` | Login (rate-limited) | No |
+| GET | `/api/auth/me` | Get current user profile | Yes |
+| PUT | `/api/auth/profile` | Update own profile | Yes |
+
+### Teacher Dashboard
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/dashboard/teacher` | Teacher dashboard data | Teacher |
+| GET | `/api/criteria` | List all NAAC criteria | Yes |
+| GET | `/api/criteria/:id` | Get criterion with sub-criteria | Yes |
+| POST | `/api/forms/submit/:subCriteriaCode` | Save/submit form data | Teacher |
+| GET | `/api/forms/:subCriteriaCode` | Get form data | Teacher |
+
+### Document Upload
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/upload/:subCriteriaCode` | Upload document | Teacher |
+| DELETE | `/api/upload/:documentId` | Delete document | Teacher |
+| GET | `/api/upload/my-documents` | List own documents | Teacher |
+
+### HOD Management
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/hod/dashboard-stats` | Dashboard statistics | HOD |
+| GET | `/api/hod/teachers-progress` | All teachers' progress matrix | HOD |
+| GET | `/api/hod/teacher/:id/data/:code` | View teacher's criterion data | HOD |
+| PUT | `/api/hod/review/:submissionId` | Verify or request revision | HOD |
+| POST | `/api/hod/remind/:teacherId` | Send reminder to teacher | HOD |
+| POST | `/api/hod/remind/all` | Bulk remind all teachers | HOD |
+| GET | `/api/hod/audit-logs` | View audit trail | HOD |
+| GET | `/api/hod/teachers` | List all teacher accounts | HOD |
+| POST | `/api/hod/teachers` | Create teacher account | HOD |
+| PUT | `/api/hod/teachers/:id/status` | Activate/deactivate teacher | HOD |
+| GET | `/api/hod/export/progress-csv` | Export progress as CSV | HOD |
+
+### Notifications
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | `/api/notifications/send` | Send notification | HOD |
+| GET | `/api/notifications/my` | Get own notifications | Yes |
+| GET | `/api/notifications/unread-count` | Get unread count | Yes |
+| PUT | `/api/notifications/:id/read` | Mark as read | Yes |
+| PUT | `/api/notifications/read-all` | Mark all as read | Yes |
+
+### Export
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/export/excel` | Export own data as Excel | Teacher |
+| GET | `/api/export/consolidated` | Export all data (consolidated) | HOD |
+
+### System
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| GET | `/api/health` | Health check | No |
+
+## Project Structure
+
+```
+naac-fms/
+├── client/                    # React Frontend (Vite)
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   │   ├── NotificationBell.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   ├── DocumentUploadZone.jsx
+│   │   │   ├── ReviewModal.jsx
+│   │   │   └── SubCriterionForm.jsx
+│   │   ├── context/           # React context (AuthContext)
+│   │   ├── layouts/           # DashboardLayout
+│   │   ├── pages/             # Route pages
+│   │   │   ├── LoginPage.jsx
+│   │   │   ├── TeacherDashboard.jsx
+│   │   │   ├── HodDashboard.jsx
+│   │   │   ├── CriterionFormPage.jsx
+│   │   │   ├── MyDocuments.jsx
+│   │   │   └── NotificationsPage.jsx
+│   │   ├── services/          # API client (axios)
+│   │   └── config/            # App configuration
+│   └── package.json
+│
+├── server/                    # Express Backend
+│   ├── src/
+│   │   ├── controllers/       # Route handlers
+│   │   ├── middleware/        # Auth, rate-limit, security
+│   │   ├── routes/            # Express route definitions
+│   │   ├── services/          # Business logic
+│   │   ├── utils/             # Helpers
+│   │   └── index.js           # Server entry point
+│   ├── prisma/
+│   │   └── schema.prisma      # Database schema
+│   ├── database/
+│   │   ├── seed.sql           # SQL seed data
+│   │   └── seed.js            # JS seeder script
+│   ├── uploads/               # File storage directory
+│   ├── test-integration.js    # Integration test suite
+│   ├── start-dev.js           # Dev startup script
+│   └── package.json
+│
+├── .env.example               # Environment variables template
+├── README.md                  # This file
+└── package.json               # Root package (concurrently)
+```
+
+## Security Features
+
+- **JWT Authentication** with role-based access control (RBAC)
+- **Rate Limiting** — 50 login attempts / 15min, 200 API requests / 15min
+- **XSS Sanitization** on all request bodies
+- **Helmet** HTTP security headers
+- **File Upload Validation** — extension, MIME type, size (10MB max)
+- **Path Traversal Prevention** on file uploads
+- **Data Isolation** — teachers can only access their own data
+- **CORS** restricted to frontend origin
+- **Audit Trail** — all significant actions are logged
+
+## Running Tests
 
 ```bash
-# Terminal 1 — Backend
-cd server && npm run dev
-
-# Terminal 2 — Frontend
-cd client && npm run dev
+cd server
+node test-integration.js
 ```
 
-### 5. Verify
+The test suite covers: Authentication, Form CRUD, HOD Review workflow, Notifications, Data Isolation (RBAC), Exports, and Audit Trail (32 tests).
 
-- **Frontend:** http://localhost:5173
-- **Backend health check:** http://localhost:5000/api/health
-- **Prisma Studio (DB viewer):** `cd server && npx prisma studio`
+## Known Limitations
 
-## 📊 Database Schema
+1. **Embedded PostgreSQL** — Development uses `embedded-postgres` which is not suitable for production. Use a standalone PostgreSQL instance in production.
+2. **File Storage** — Files are stored on local disk. For production, integrate with S3 or similar cloud storage.
+3. **PDF Export** — Requires Puppeteer (headless Chrome). May need additional system dependencies on Linux servers.
+4. **Email Notifications** — Currently in-app only. Email integration (SMTP/SendGrid) is not yet implemented.
+5. **Prisma Config** — Uses deprecated `package.json#prisma` config; should migrate to `prisma.config.ts` for Prisma 7+.
 
-```
-users (teacher | hod)
-  ├──1:N──▶ form_submissions ◀──N:1── sub_criteria ──N:1──▶ criteria
-  ├──1:N──▶ uploaded_documents ◀──N:1── sub_criteria
-  │                             ◀──N:0..1── form_submissions
-  ├──1:N──▶ activity_logs
-  └──1:N──▶ notifications (recipient / sender)
-```
+## License
 
-**7 Tables:** `users`, `criteria`, `sub_criteria`, `form_submissions`,
-`uploaded_documents`, `activity_logs`, `notifications`
-
-**Schema files:**
-- Raw SQL: `server/database/schema.sql` + `server/database/seed.sql`
-- Prisma ORM: `server/prisma/schema.prisma` + `server/prisma/seed.js`
-
-## 🔐 User Roles
-
-| Role      | Description                                   |
-| --------- | --------------------------------------------- |
-| `teacher` | Can fill forms and upload files                |
-| `hod`     | Super user — manage all data, users, exports   |
-
-**Default credentials (after seeding):**
-- HOD: `hod@naac.edu` / `HOD@2024`
-- Teacher: `anita.sharma@naac.edu` / `Teacher@123`
-- Teacher: `vikram.patel@naac.edu` / `Teacher@123`
-- Teacher: `meera.desai@naac.edu` / `Teacher@123`
-
-## 📁 API Routes
-
-| Method | Endpoint                       | Status | Description            |
-| ------ | ------------------------------ | ------ | ---------------------- |
-| POST   | `/api/auth/register`           | ✅     | Register teacher       |
-| POST   | `/api/auth/login`              | ✅     | Login (rate-limited)   |
-| GET    | `/api/auth/me`                 | ✅     | Get current profile    |
-| PUT    | `/api/auth/profile`            | ✅     | Update own profile     |
-| GET    | `/api/criteria`                | 501    | List all criteria      |
-| GET    | `/api/criteria/:id`            | 501    | Get single criterion   |
-| GET    | `/api/criteria/:id/sub`        | 501    | Get sub-criteria       |
-| POST   | `/api/upload`                  | 501    | Upload a file          |
-| GET    | `/api/upload/:id`              | 501    | Download a file        |
-| DELETE | `/api/upload/:id`              | 501    | Delete a file          |
-| GET    | `/api/export/pdf/:criterionId` | 501    | Export as PDF          |
-| GET    | `/api/export/excel/:criterionId` | 501  | Export as Excel        |
-| GET    | `/api/health`                  | ✅     | Server health check    |
-
-## 📝 License
-
-ISC
+MIT

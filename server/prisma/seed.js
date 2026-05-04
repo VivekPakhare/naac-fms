@@ -110,58 +110,68 @@ async function main() {
   // ══════════════════════════════════════════════════════════
 
   const subCriteriaData = [
-    // ── C1: Curricular Aspects (3) ─────────────────────────
+    // ── C1: Curricular Aspects (4) ─────────────────────────
     { id: 1,  criteriaId: 1, code: '1.1', name: 'Curricular Planning and Implementation',
       description: 'Effective curriculum delivery through structured planning, adequate teaching-learning resources, and well-organized academic calendar.' },
     { id: 2,  criteriaId: 1, code: '1.2', name: 'Academic Flexibility',
       description: 'Range of program options, choice-based credit systems, credit transfer policies, and interdisciplinary/multidisciplinary courses offered.' },
     { id: 3,  criteriaId: 1, code: '1.3', name: 'Curriculum Enrichment',
       description: 'Integration of cross-cutting issues (gender, environment, sustainability, human values) and value-added courses beyond the syllabus.' },
+    { id: 4,  criteriaId: 1, code: '1.4', name: 'Feedback System',
+      description: 'Feedback on curriculum from students, teachers, employers, and alumni. Action Taken Reports (ATR) on feedback.' },
 
-    // ── C2: Teaching-Learning and Evaluation (4) ───────────
-    { id: 4,  criteriaId: 2, code: '2.1', name: 'Student Enrollment and Profile',
+    // ── C2: Teaching-Learning and Evaluation (5) ───────────
+    { id: 5,  criteriaId: 2, code: '2.1', name: 'Student Enrollment and Profile',
       description: 'Demand ratio, student diversity, reserved category admissions, and enrollment trends over the assessment period.' },
-    { id: 5,  criteriaId: 2, code: '2.2', name: 'Catering to Student Diversity',
+    { id: 6,  criteriaId: 2, code: '2.2', name: 'Catering to Student Diversity',
       description: 'Strategies for advanced learners and slow learners, student mentoring, bridge courses, remedial coaching, and language labs.' },
-    { id: 6,  criteriaId: 2, code: '2.3', name: 'Teaching-Learning Process',
+    { id: 7,  criteriaId: 2, code: '2.3', name: 'Teaching-Learning Process',
       description: 'Student-centric pedagogies, experiential learning, participative learning, ICT-enabled teaching, and innovative practices.' },
-    { id: 7,  criteriaId: 2, code: '2.4', name: 'Teacher Quality',
+    { id: 8,  criteriaId: 2, code: '2.4', name: 'Teacher Quality',
       description: 'Percentage of full-time teachers with PhD/NET/SET, faculty development programs, awards, and recognition received.' },
+    { id: 9,  criteriaId: 2, code: '2.5', name: 'Evaluation Process and Reforms',
+      description: 'Continuous Internal Evaluation reforms, pass percentage analysis, student performance tracking, and result transparency.' },
 
-    // ── C3: Research, Innovations and Extension (3) ────────
-    { id: 8,  criteriaId: 3, code: '3.1', name: 'Promotion of Research and Facilities',
+    // ── C3: Research, Innovations and Extension (5) ────────
+    { id: 10,  criteriaId: 3, code: '3.1', name: 'Promotion of Research and Facilities',
       description: 'Research grants received, seed money for research, teachers recognized as research guides, and research facilities.' },
-    { id: 9,  criteriaId: 3, code: '3.2', name: 'Resource Mobilization for Research',
+    { id: 11,  criteriaId: 3, code: '3.2', name: 'Resource Mobilization for Research',
       description: 'Grants from government and non-government agencies, industry-sponsored research, and consultancy revenue.' },
-    { id: 10, criteriaId: 3, code: '3.3', name: 'Innovation Ecosystem',
+    { id: 12, criteriaId: 3, code: '3.3', name: 'Innovation Ecosystem',
       description: 'Innovation and start-up support, incubation centres, MoUs with industry, and technology transfer activities.' },
+    { id: 13, criteriaId: 3, code: '3.4', name: 'Extension Activities',
+      description: 'NSS, NCC, community service programs, outreach activities, and social responsibility initiatives.' },
+    { id: 14, criteriaId: 3, code: '3.5', name: 'Collaboration',
+      description: 'Functional MOUs, faculty/student exchange, collaborative research, and linkages with industry and institutions.' },
 
     // ── C4: Infrastructure and Learning Resources (3) ──────
-    { id: 11, criteriaId: 4, code: '4.1', name: 'Physical Facilities',
+    { id: 15, criteriaId: 4, code: '4.1', name: 'Physical Facilities',
       description: 'Availability and adequacy of classrooms, laboratories, library, sports facilities, ICT-enabled facilities, and other infrastructure.' },
-    { id: 12, criteriaId: 4, code: '4.2', name: 'Library as a Learning Resource',
+    { id: 16, criteriaId: 4, code: '4.2', name: 'Library as a Learning Resource',
       description: 'Library automation, subscription to e-journals/e-books, usage statistics, and annual expenditure on library resources.' },
-    { id: 13, criteriaId: 4, code: '4.3', name: 'IT Infrastructure',
+    { id: 17, criteriaId: 4, code: '4.3', name: 'IT Infrastructure',
       description: 'Internet bandwidth, Wi-Fi facilities, student-computer ratio, ICT-enabled classrooms, and smart campus initiatives.' },
 
-    // ── C5: Student Support and Progression (2) ────────────
-    { id: 14, criteriaId: 5, code: '5.1', name: 'Student Support',
+    // ── C5: Student Support and Progression (3) ────────────
+    { id: 18, criteriaId: 5, code: '5.1', name: 'Student Support',
       description: 'Scholarships, freeships, capability enhancement schemes, career counseling, competitive exam guidance, and grievance redressal.' },
-    { id: 15, criteriaId: 5, code: '5.2', name: 'Student Progression',
+    { id: 19, criteriaId: 5, code: '5.2', name: 'Student Progression',
       description: 'Placement records, higher education progression, qualifying in state/national/international examinations, and alumni contributions.' },
+    { id: 20, criteriaId: 5, code: '5.3', name: 'Student Participation and Activities',
+      description: 'Alumni engagement, alumni events, student clubs and associations, and co-curricular activities.' },
 
     // ── C6: Governance, Leadership and Management (3) ──────
-    { id: 16, criteriaId: 6, code: '6.1', name: 'Institutional Vision and Leadership',
+    { id: 21, criteriaId: 6, code: '6.1', name: 'Institutional Vision and Leadership',
       description: 'Governance and leadership reflecting institutional vision, decentralization and participative management practices.' },
-    { id: 17, criteriaId: 6, code: '6.2', name: 'Strategy Development and Deployment',
+    { id: 22, criteriaId: 6, code: '6.2', name: 'Strategy Development and Deployment',
       description: 'Perspective/strategic plan, institutional development, functioning of IQAC, and implementation of quality initiatives.' },
-    { id: 18, criteriaId: 6, code: '6.3', name: 'Faculty Empowerment Strategies',
+    { id: 23, criteriaId: 6, code: '6.3', name: 'Faculty Empowerment Strategies',
       description: 'Professional development programs, performance appraisal system, financial support for conferences, and welfare measures.' },
 
     // ── C7: Institutional Values and Best Practices (2) ────
-    { id: 19, criteriaId: 7, code: '7.1', name: 'Institutional Values and Social Responsibilities',
+    { id: 24, criteriaId: 7, code: '7.1', name: 'Institutional Values and Social Responsibilities',
       description: 'Gender equity, environmental consciousness, waste management, green campus initiatives, and divyangjan-friendly facilities.' },
-    { id: 20, criteriaId: 7, code: '7.2', name: 'Best Practices and Institutional Distinctiveness',
+    { id: 25, criteriaId: 7, code: '7.2', name: 'Best Practices and Institutional Distinctiveness',
       description: 'Documentation of two best practices and one area of institutional distinctiveness contributing to academic excellence.' },
   ];
 

@@ -54,6 +54,7 @@ enum NotificationType {
   reminder
   revision_request
   verified
+  deadline
 
   @@map("notification_type")
 }
@@ -71,6 +72,7 @@ model User {
   designation    String?  @db.VarChar(255)
   subjectsTaught String?  @map("subjects_taught") @db.Text
   isActive       Boolean  @default(true) @map("is_active")
+  lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
@@ -129,6 +131,8 @@ model FormSubmission {
   status        SubmissionStatus @default(draft)
   hodComment    String?          @map("hod_comment") @db.Text
   submittedAt   DateTime?        @map("submitted_at") @db.Timestamptz
+  verifiedAt    DateTime?        @map("verified_at") @db.Timestamptz
+  verifiedBy    String?          @map("verified_by") @db.Uuid
   updatedAt     DateTime         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz
 
   // Relations

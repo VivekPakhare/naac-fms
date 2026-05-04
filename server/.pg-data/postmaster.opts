@@ -1,0 +1,1 @@
+C:/Users/Admin/Desktop/hackathon/NAAC/naac-fms/server/node_modules/@embedded-postgres/windows-x64/native/bin/postgres.exe "-D" "C:\Users\Admin\Desktop\hackathon\NAAC\naac-fms\server\.pg-data" "-p" "5432"

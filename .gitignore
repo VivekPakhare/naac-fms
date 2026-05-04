@@ -6,6 +6,11 @@ node_modules/
 .env.local
 .env.*.local
 
+# Embedded PostgreSQL data
+server/.pg-data/
+server/pg-data/
+server/pgsql/
+
 # Build output
 client/dist/
 server/dist/

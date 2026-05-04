@@ -15,7 +15,7 @@ INSERT INTO users (full_name, email, password_hash, role, department, designatio
 VALUES (
     'Dr. Rajesh Kumar',
     'hod@naac.edu',
-    '$2a$12$LJ3bX9ZG5Y0Ml/0gSvWRPuBiX8QjHF4VJxRz7kL9mN2oP1qW3sT5u',
+    '$2b$12$eVpf4W7aNPQ1ZA3ycoab9Ovsr6yibfOAx4lutsGjR1iYtRsizVexu',
     'hod',
     'Computer Science',
     'Head of Department',

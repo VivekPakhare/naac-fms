@@ -8,11 +8,11 @@ import {
 import toast from 'react-hot-toast';
 
 const CRITERIA = [
-  { code: 'C1', name: 'Curriculum Aspects', subs: ['1.1', '1.2', '1.3'] },
-  { code: 'C2', name: 'Teaching-Learning & Evaluation', subs: ['2.1', '2.2', '2.3', '2.4'] },
-  { code: 'C3', name: 'Research & Innovation', subs: ['3.1', '3.2', '3.3'] },
+  { code: 'C1', name: 'Curriculum Aspects', subs: ['1.1', '1.2', '1.3', '1.4'] },
+  { code: 'C2', name: 'Teaching-Learning & Evaluation', subs: ['2.1', '2.2', '2.3', '2.4', '2.5'] },
+  { code: 'C3', name: 'Research & Innovation', subs: ['3.1', '3.2', '3.3', '3.4', '3.5'] },
   { code: 'C4', name: 'Infrastructure & Resources', subs: ['4.1', '4.2', '4.3'] },
-  { code: 'C5', name: 'Student Support', subs: ['5.1', '5.2'] },
+  { code: 'C5', name: 'Student Support', subs: ['5.1', '5.2', '5.3'] },
   { code: 'C6', name: 'Governance & Management', subs: ['6.1', '6.2', '6.3'] },
   { code: 'C7', name: 'Values & Best Practices', subs: ['7.1', '7.2'] },
 ];
@@ -76,75 +76,102 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Nav links */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          <NavLink to="/dashboard/teacher" end className={linkClass} onClick={onClose}>
-            <LayoutDashboard className="w-[18px] h-[18px]" />
-            Dashboard
-          </NavLink>
+          {user?.role === 'hod' ? (
+            /* ── HOD Navigation ── */
+            <>
+              <NavLink to="/dashboard/hod" end className={linkClass} onClick={onClose}>
+                <LayoutDashboard className="w-[18px] h-[18px]" />
+                Dashboard
+              </NavLink>
+              <NavLink to="/dashboard/hod/notifications" className={linkClass} onClick={onClose}>
+                <Bell className="w-[18px] h-[18px]" />
+                Notifications
+              </NavLink>
+              <NavLink to="/dashboard/hod/profile" className={linkClass} onClick={onClose}>
+                <User className="w-[18px] h-[18px]" />
+                Profile
+              </NavLink>
+            </>
+          ) : (
+            /* ── Teacher Navigation ── */
+            <>
+              <NavLink to="/dashboard/teacher" end className={linkClass} onClick={onClose}>
+                <LayoutDashboard className="w-[18px] h-[18px]" />
+                Dashboard
+              </NavLink>
 
-          {/* Criteria — collapsible */}
-          <div className="pt-3 pb-1">
-            <p className="px-4 text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2">
-              Criteria
-            </p>
-          </div>
+              {/* Criteria — collapsible */}
+              <div className="pt-3 pb-1">
+                <p className="px-4 text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2">
+                  Criteria
+                </p>
+              </div>
 
-          {CRITERIA.map((c) => (
-            <div key={c.code}>
-              <button
-                onClick={() => toggleCriteria(c.code)}
-                className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-200"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="w-[18px] text-center text-xs font-bold text-indigo-400/70">
-                    {c.code.replace('C', '')}
-                  </span>
-                  <span className="truncate text-left">{c.name}</span>
+              {CRITERIA.map((c) => (
+                <div key={c.code}>
+                  <button
+                    onClick={() => toggleCriteria(c.code)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-slate-200 hover:bg-slate-800/60 transition-all duration-200"
+                  >
+                    <div className="flex items-center gap-3">
+                      <span className="w-[18px] text-center text-xs font-bold text-indigo-400/70">
+                        {c.code.replace('C', '')}
+                      </span>
+                      <span className="truncate text-left">{c.name}</span>
+                    </div>
+                    {expandedCriteria === c.code ? (
+                      <ChevronDown className="w-4 h-4 text-slate-600 shrink-0" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4 text-slate-600 shrink-0" />
+                    )}
+                  </button>
+
+                  {expandedCriteria === c.code && (
+                    <div className="ml-8 mt-1 space-y-0.5 border-l border-slate-800 pl-3">
+                      <NavLink
+                        to={`/dashboard/teacher/criteria/${c.code.replace('C', '')}`}
+                        onClick={onClose}
+                        className="block w-full text-left px-3 py-1.5 text-xs text-indigo-400/80 hover:text-indigo-400 rounded-lg hover:bg-slate-800/40 transition-colors font-medium"
+                      >
+                        Open {c.code}
+                      </NavLink>
+                      {c.subs.map((sub) => (
+                        <NavLink
+                          key={sub}
+                          to={`/dashboard/teacher/criteria/${c.code.replace('C', '')}`}
+                          onClick={onClose}
+                          className="block w-full text-left px-3 py-1.5 text-xs text-slate-500 hover:text-indigo-400 rounded-lg hover:bg-slate-800/40 transition-colors"
+                        >
+                          {sub}
+                        </NavLink>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                {expandedCriteria === c.code ? (
-                  <ChevronDown className="w-4 h-4 text-slate-600 shrink-0" />
-                ) : (
-                  <ChevronRight className="w-4 h-4 text-slate-600 shrink-0" />
-                )}
-              </button>
+              ))}
 
-              {/* Sub-criteria links */}
-              {expandedCriteria === c.code && (
-                <div className="ml-8 mt-1 space-y-0.5 border-l border-slate-800 pl-3">
-                  {c.subs.map((sub) => (
-                    <button
-                      key={sub}
-                      onClick={onClose}
-                      className="block w-full text-left px-3 py-1.5 text-xs text-slate-500 hover:text-indigo-400 rounded-lg hover:bg-slate-800/40 transition-colors"
-                    >
-                      {sub}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+              {/* Other nav items */}
+              <div className="pt-3 pb-1">
+                <p className="px-4 text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2">
+                  Account
+                </p>
+              </div>
 
-          {/* Other nav items */}
-          <div className="pt-3 pb-1">
-            <p className="px-4 text-[10px] font-semibold text-slate-600 uppercase tracking-widest mb-2">
-              Account
-            </p>
-          </div>
+              <NavLink to="/dashboard/teacher/documents" className={linkClass} onClick={onClose}>
+                <FileText className="w-[18px] h-[18px]" />
+                My Documents
+              </NavLink>
 
-          <NavLink to="/dashboard/teacher/documents" className={linkClass} onClick={onClose}>
-            <FileText className="w-[18px] h-[18px]" />
-            My Documents
-          </NavLink>
-
-          <NavLink to="/dashboard/teacher/profile" className={linkClass} onClick={onClose}>
-            <User className="w-[18px] h-[18px]" />
-            My Profile
-          </NavLink>
-
-          <NavLink to="/dashboard/teacher/notifications" className={linkClass} onClick={onClose}>
-            <Bell className="w-[18px] h-[18px]" />
-            Notifications
-          </NavLink>
+              <NavLink to="/dashboard/teacher/notifications" className={linkClass} onClick={onClose}>
+                <Bell className="w-[18px] h-[18px]" />
+                Notifications
+              </NavLink>
+              <NavLink to="/dashboard/teacher/profile" className={linkClass} onClick={onClose}>
+                <User className="w-[18px] h-[18px]" />
+                Profile
+              </NavLink>
+            </>
+          )}
         </nav>
 
         {/* User card + Logout */}
@@ -155,7 +182,7 @@ export default function Sidebar({ isOpen, onClose }) {
             </div>
             <div className="min-w-0">
               <p className="text-white text-sm font-medium truncate">{user?.fullName}</p>
-              <p className="text-slate-500 text-[11px] truncate">{user?.department || 'Teacher'}</p>
+              <p className="text-slate-500 text-[11px] truncate">{user?.role === 'hod' ? 'HOD' : (user?.department || 'Teacher')}</p>
             </div>
           </div>
           <button
