@@ -57,15 +57,25 @@ export function AuthProvider({ children }) {
   };
 
   // ── Register ─────────────────────────────────────────────
+  // Now returns { requiresVerification, email } instead of setting auth state.
   const register = async (formData) => {
     const res = await api.post('/auth/register', formData);
-    const { user: userData, token: newToken } = res.data.data;
+    const data = res.data.data;
 
-    localStorage.setItem('naac_token', newToken);
-    setUser(userData);
-    setToken(newToken);
+    // New flow: registration requires email verification
+    if (data.requiresVerification) {
+      return { requiresVerification: true, email: data.email };
+    }
 
-    return userData;
+    // Fallback for already-verified users (shouldn't happen in normal flow)
+    if (data.token) {
+      localStorage.setItem('naac_token', data.token);
+      setUser(data.user);
+      setToken(data.token);
+      return data.user;
+    }
+
+    return data;
   };
 
   // ── Logout ───────────────────────────────────────────────

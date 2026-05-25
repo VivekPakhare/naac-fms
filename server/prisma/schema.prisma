@@ -72,6 +72,11 @@ model User {
   designation    String?  @db.VarChar(255)
   subjectsTaught String?  @map("subjects_taught") @db.Text
   isActive       Boolean  @default(true) @map("is_active")
+  emailVerified    Boolean   @default(false) @map("email_verified")
+  verificationOtp  String?   @map("verification_otp")
+  otpExpiresAt     DateTime? @map("otp_expires_at")
+  resetOtp         String?   @map("reset_otp")
+  resetOtpExpiresAt DateTime? @map("reset_otp_expires_at")
   lastLoginAt    DateTime? @map("last_login_at") @db.Timestamptz
   createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime @default(now()) @updatedAt @map("updated_at") @db.Timestamptz

@@ -54,10 +54,10 @@ async function register(req, res, next) {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful.',
+      message: 'Registration successful. Please verify your email.',
       data: {
-        user: result.user,
-        token: result.token,
+        requiresVerification: true,
+        email: result.user.email,
       },
     });
   } catch (error) {
@@ -106,6 +106,143 @@ async function login(req, res, next) {
         user: result.user,
         token: result.token,
       },
+    });
+  } catch (error) {
+    if (error.status) {
+      const response = { success: false, message: error.message };
+      // Pass along requiresVerification flag so frontend can prompt user
+      if (error.requiresVerification) {
+        response.requiresVerification = true;
+        response.email = error.userEmail;
+      }
+      return res.status(error.status).json(response);
+    }
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/verify-otp
+ * Verify email using 6-digit OTP.
+ */
+async function verifyOtp(req, res, next) {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email and OTP are required.',
+      });
+    }
+
+    const result = await authService.verifyOtp(email.toLowerCase().trim(), otp.trim());
+
+    res.json({
+      success: true,
+      message: 'Email verified successfully.',
+      data: {
+        user: result.user,
+        token: result.token,
+      },
+    });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ success: false, message: error.message });
+    }
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/resend-otp
+ * Resend verification OTP.
+ */
+async function resendOtp(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required.',
+      });
+    }
+
+    const result = await authService.resendOtp(email.toLowerCase().trim());
+
+    res.json({
+      success: true,
+      message: result.message,
+    });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ success: false, message: error.message });
+    }
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/forgot-password
+ * Send password reset OTP.
+ */
+async function forgotPassword(req, res, next) {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email is required.',
+      });
+    }
+
+    const result = await authService.forgotPassword(email.toLowerCase().trim());
+
+    res.json({
+      success: true,
+      message: result.message,
+    });
+  } catch (error) {
+    if (error.status) {
+      return res.status(error.status).json({ success: false, message: error.message });
+    }
+    next(error);
+  }
+}
+
+/**
+ * POST /api/auth/reset-password
+ * Reset password using OTP.
+ */
+async function resetPassword(req, res, next) {
+  try {
+    const { email, otp, new_password } = req.body;
+
+    if (!email || !otp || !new_password) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email, OTP, and new password are required.',
+      });
+    }
+
+    if (new_password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password must be at least 6 characters.',
+      });
+    }
+
+    const result = await authService.resetPassword(
+      email.toLowerCase().trim(),
+      otp.trim(),
+      new_password
+    );
+
+    res.json({
+      success: true,
+      message: result.message,
     });
   } catch (error) {
     if (error.status) {
@@ -174,4 +311,4 @@ async function updateProfile(req, res, next) {
   }
 }
 
-module.exports = { register, login, getMe, updateProfile };
+module.exports = { register, login, getMe, updateProfile, verifyOtp, resendOtp, forgotPassword, resetPassword };

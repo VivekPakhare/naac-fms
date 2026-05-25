@@ -23,7 +23,7 @@ async function main() {
 
   const hod = await prisma.user.upsert({
     where: { email: 'hod@naac.edu' },
-    update: { passwordHash: hodPassword },
+    update: { passwordHash: hodPassword, emailVerified: true },
     create: {
       fullName: 'Dr. Rajesh Kumar',
       email: 'hod@naac.edu',
@@ -32,6 +32,7 @@ async function main() {
       department: 'Computer Science',
       designation: 'Head of Department',
       isActive: true,
+      emailVerified: true,
     },
   });
 
@@ -70,12 +71,13 @@ async function main() {
   for (const t of teachers) {
     const created = await prisma.user.upsert({
       where: { email: t.email },
-      update: {},
+      update: { emailVerified: true },
       create: {
         ...t,
         passwordHash: teacherPassword,
         role: 'teacher',
         isActive: true,
+        emailVerified: true,
       },
     });
     console.log(`✅ Teacher created: ${created.email}`);
