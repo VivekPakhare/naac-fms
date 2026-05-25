@@ -1,4 +1,4 @@
-# NAAC FMS — Entity Relationship Diagram
+# college accreditation & document workflow platform — Entity Relationship Diagram
 
 ## Database Schema Overview
 
@@ -130,3 +130,4 @@ erDiagram
 | `activity_logs` | `idx_log_created_at` | `created_at` |
 | `notifications` | `idx_notif_recipient` | `recipient_id` |
 | `notifications` | `idx_notif_type` | `type` |
+

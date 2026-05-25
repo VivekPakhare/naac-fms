@@ -10,7 +10,7 @@ async function sendVerificationOtp(email, fullName, otp) {
   const html = `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #0f172a; border-radius: 12px; overflow: hidden;">
       <div style="background: linear-gradient(135deg, #059669, #0d9488); padding: 24px 32px;">
-        <h1 style="color: #fff; margin: 0; font-size: 22px;">NAAC FMS</h1>
+        <h1 style="color: #fff; margin: 0; font-size: 22px;">college accreditation & document workflow platform</h1>
         <p style="color: #d1fae5; margin: 4px 0 0; font-size: 13px;">Email Verification</p>
       </div>
       <div style="padding: 32px;">
@@ -19,7 +19,7 @@ async function sendVerificationOtp(email, fullName, otp) {
         <div style="background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
           <span style="font-size: 32px; font-weight: 700; letter-spacing: 8px; color: #34d399;">${otp}</span>
         </div>
-        <p style="color: #64748b; font-size: 13px;">If you didn't create an account on NAAC FMS, you can safely ignore this email.</p>
+        <p style="color: #64748b; font-size: 13px;">If you didn't create an account on college accreditation & document workflow platform, you can safely ignore this email.</p>
       </div>
       <div style="background: #1e293b; padding: 16px 32px; text-align: center;">
         <p style="color: #475569; font-size: 12px; margin: 0;">© ${new Date().getFullYear()} NAAC File Management System</p>
@@ -30,7 +30,7 @@ async function sendVerificationOtp(email, fullName, otp) {
   await transporter.sendMail({
     from: MAIL_FROM,
     to: email,
-    subject: 'Verify Your Email — NAAC FMS',
+    subject: 'Verify Your Email — college accreditation & document workflow platform',
     html,
   });
 }
@@ -45,7 +45,7 @@ async function sendPasswordResetOtp(email, fullName, otp) {
   const html = `
     <div style="font-family: 'Segoe UI', Arial, sans-serif; max-width: 480px; margin: 0 auto; background: #0f172a; border-radius: 12px; overflow: hidden;">
       <div style="background: linear-gradient(135deg, #4f46e5, #7c3aed); padding: 24px 32px;">
-        <h1 style="color: #fff; margin: 0; font-size: 22px;">NAAC FMS</h1>
+        <h1 style="color: #fff; margin: 0; font-size: 22px;">college accreditation & document workflow platform</h1>
         <p style="color: #e0e7ff; margin: 4px 0 0; font-size: 13px;">Password Reset</p>
       </div>
       <div style="padding: 32px;">
@@ -65,9 +65,10 @@ async function sendPasswordResetOtp(email, fullName, otp) {
   await transporter.sendMail({
     from: MAIL_FROM,
     to: email,
-    subject: 'Reset Your Password — NAAC FMS',
+    subject: 'Reset Your Password — college accreditation & document workflow platform',
     html,
   });
 }
 
 module.exports = { sendVerificationOtp, sendPasswordResetOtp };
+

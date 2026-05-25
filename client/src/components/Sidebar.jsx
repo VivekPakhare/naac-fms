@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard, BookOpen, FileText, User, Bell, LogOut, ChevronDown, ChevronRight,
-  X, GraduationCap
+  X
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
@@ -59,10 +59,10 @@ export default function Sidebar({ isOpen, onClose }) {
         <div className="flex items-center justify-between px-5 h-16 border-b border-slate-800/80 shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/20">
-              <GraduationCap className="w-5 h-5 text-white" />
+              <span className="text-white text-[9px] font-bold tracking-wide leading-none">CAD-WP</span>
             </div>
             <div>
-              <h1 className="text-white font-bold text-sm tracking-tight">NAAC FMS</h1>
+              <h1 className="text-white font-bold text-sm tracking-tight">college accreditation & document workflow platform</h1>
               <p className="text-slate-500 text-[10px]">File Management</p>
             </div>
           </div>
@@ -197,3 +197,4 @@ export default function Sidebar({ isOpen, onClose }) {
     </>
   );
 }
+

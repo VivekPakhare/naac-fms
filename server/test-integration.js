@@ -1,5 +1,5 @@
 /**
- * NAAC FMS Integration Test Script
+ * college accreditation & document workflow platform Integration Test Script
  * Tests the complete workflow end-to-end.
  * Idempotent: handles data from previous runs gracefully.
  */
@@ -49,7 +49,7 @@ const TS = Date.now().toString(36);
 
 async function run() {
   console.log('\n======================================');
-  console.log('  NAAC FMS - Integration Test Suite');
+  console.log('  college accreditation & document workflow platform - Integration Test Suite');
   console.log('======================================\n');
 
   // == 1. Authentication ==
@@ -235,3 +235,4 @@ run().catch((e) => {
   console.error('Test runner error:', e.message);
   process.exit(1);
 });
+

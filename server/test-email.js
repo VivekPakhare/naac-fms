@@ -45,8 +45,8 @@ async function test() {
     const info = await transporter.sendMail({
       from: process.env.SMTP_FROM || process.env.SMTP_USER,
       to: process.env.SMTP_USER, // send to yourself
-      subject: 'NAAC FMS — SMTP Test',
-      html: '<h2>✅ SMTP is working!</h2><p>Your NAAC FMS email configuration is correct.</p>',
+      subject: 'college accreditation & document workflow platform — SMTP Test',
+      html: '<h2>✅ SMTP is working!</h2><p>Your college accreditation & document workflow platform email configuration is correct.</p>',
     });
     console.log('✅ Test email sent! Message ID:', info.messageId);
     console.log('   Check your inbox at:', process.env.SMTP_USER);
@@ -56,3 +56,4 @@ async function test() {
 }
 
 test();
+

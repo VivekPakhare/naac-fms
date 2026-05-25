@@ -259,7 +259,7 @@ async function generateTeacherPdf(teacherId) {
       doc.switchToPage(i);
       doc.fontSize(7).font('Helvetica').fillColor('#AAAAAA')
         .text(
-          `NAAC FMS  |  ${user.fullName}  |  Page ${i + 1} of ${pages.count}  |  ${exportDate}`,
+          `college accreditation & document workflow platform  |  ${user.fullName}  |  Page ${i + 1} of ${pages.count}  |  ${exportDate}`,
           50, doc.page.height - 35, { width: pageWidth, align: 'center' }
         );
     }
@@ -269,3 +269,4 @@ async function generateTeacherPdf(teacherId) {
 }
 
 module.exports = { generateTeacherPdf };
+
