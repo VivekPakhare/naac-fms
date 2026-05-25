@@ -37,6 +37,7 @@ async function generateTeacherPdf(teacherId) {
     const doc = new PDFDocument({
       size: 'A4',
       margins: { top: 50, bottom: 60, left: 50, right: 50 },
+      bufferPages: true,
       info: {
         Title: `NAAC Documentation — ${user.fullName}`,
         Author: 'NAAC File Management System',
@@ -255,11 +256,12 @@ async function generateTeacherPdf(teacherId) {
 
     // ── Footer on every page ──────────────────────────────────
     const pages = doc.bufferedPageRange();
-    for (let i = 0; i < pages.count; i++) {
+    const lastPageIndex = pages.start + pages.count - 1;
+    for (let i = pages.start; i <= lastPageIndex; i++) {
       doc.switchToPage(i);
       doc.fontSize(7).font('Helvetica').fillColor('#AAAAAA')
         .text(
-          `college accreditation & document workflow platform  |  ${user.fullName}  |  Page ${i + 1} of ${pages.count}  |  ${exportDate}`,
+          `college accreditation & document workflow platform  |  ${user.fullName}  |  Page ${i - pages.start + 1} of ${pages.count}  |  ${exportDate}`,
           50, doc.page.height - 35, { width: pageWidth, align: 'center' }
         );
     }

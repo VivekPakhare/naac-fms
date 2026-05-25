@@ -7,6 +7,7 @@ import {
   ChevronRight, Download, ExternalLink, CheckCircle2,
   XCircle, RefreshCw, Loader2, FolderOpen
 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const STATUS_CONFIG = {
   not_started: { label: 'Not Started', bg: 'bg-slate-700/50', text: 'text-slate-400', ring: 'ring-slate-600' },
