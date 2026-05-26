@@ -1,5 +1,5 @@
 [build]
-  command = "npm install && cd server && npm install && cd ../client && npm install --include=dev && npm run build"
+  command = "npm install && cd server && npm install && npx prisma migrate deploy && node prisma/seed.js && cd ../client && npm install --include=dev && npm run build"
   publish = "client/dist"
   functions = "netlify/functions"
 

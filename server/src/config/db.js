@@ -25,8 +25,8 @@ async function connectDB() {
     console.log('✅ PostgreSQL connected via Prisma');
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    // Don't exit on Vercel — let it retry on next invocation
-    if (!process.env.VERCEL) {
+    // Only exit in local dev — let serverless environments retry on next invocation
+    if (!process.env.VERCEL && !process.env.NETLIFY) {
       process.exit(1);
     }
   }
