@@ -82,11 +82,11 @@ app.use((err, _req, res, _next) => {
   });
 });
 
-// ── Export app for Vercel serverless ──────────────────────
+// ── Export app for serverless (Vercel / Netlify) ──────────
 module.exports = app;
 
-// ── Start Server (local dev only, not on Vercel) ─────────
-if (!process.env.VERCEL) {
+// ── Start Server (local dev only, not on Vercel/Netlify) ──
+if (!process.env.VERCEL && !process.env.NETLIFY) {
   async function startServer() {
     await connectDB();
 
