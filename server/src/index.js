@@ -31,12 +31,27 @@ app.use(helmet({
 
 // ── Core Middleware ───────────────────────────────────────
 app.set('trust proxy', 1);
+
+// ── CORS — allow both localhost and production origins ────
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.CLIENT_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: function (origin, callback) {
+    // Allow requests with no origin (mobile apps, curl, server-to-server, same-origin)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
+
 app.use(express.json({ limit: '5mb' }));
 app.use(express.urlencoded({ extended: true, limit: '5mb' }));
 app.use(sanitizeBody); // XSS protection on all request bodies
@@ -67,14 +82,19 @@ app.use((err, _req, res, _next) => {
   });
 });
 
-// ── Start Server ─────────────────────────────────────────
-async function startServer() {
-  await connectDB();
+// ── Export app for Vercel serverless ──────────────────────
+module.exports = app;
 
-  app.listen(PORT, () => {
-    console.log(`\n🚀 NAAC Server running on http://localhost:${PORT}`);
-    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}\n`);
-  });
+// ── Start Server (local dev only, not on Vercel) ─────────
+if (!process.env.VERCEL) {
+  async function startServer() {
+    await connectDB();
+
+    app.listen(PORT, () => {
+      console.log(`\n🚀 NAAC Server running on http://localhost:${PORT}`);
+      console.log(`   Environment: ${process.env.NODE_ENV || 'development'}\n`);
+    });
+  }
+
+  startServer();
 }
-
-startServer();

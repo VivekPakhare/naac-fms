@@ -1,7 +1,9 @@
 const { prisma } = require('../config/db');
-const { upload, UPLOAD_DIR, getUploadDir } = require('../config/multer');
+const { upload, getCloudinaryFolder, isCloudinaryEnabled } = require('../config/multer');
 const path = require('path');
 const fs = require('fs');
+const multer = require('multer');
+const { v4: uuidv4 } = require('uuid');
 
 const MIME_TO_CONTENT_TYPE = {
   pdf: 'application/pdf',
@@ -12,8 +14,35 @@ const MIME_TO_CONTENT_TYPE = {
 };
 
 /**
+ * Upload a buffer to Cloudinary.
+ * Returns { public_id, secure_url, bytes }.
+ */
+async function uploadToCloudinary(buffer, folder, originalname) {
+  const cloudinary = require('../config/cloudinary');
+  const ext = path.extname(originalname).toLowerCase().replace('.', '');
+  const publicId = `${folder}/${uuidv4()}`;
+
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        public_id: publicId,
+        resource_type: 'raw',
+        format: ext,
+      },
+      (error, result) => {
+        if (error) return reject(error);
+        resolve(result);
+      }
+    );
+    stream.end(buffer);
+  });
+}
+
+/**
  * POST /api/upload/:subCriteriaCode
- * Upload a file for a sub-criterion. Moves from temp dir to structured path.
+ * Upload a file for a sub-criterion.
+ * - Cloudinary: buffer is uploaded via upload_stream.
+ * - Disk: file is in temp dir, moved to structured path.
  */
 async function uploadFile(req, res, next) {
   try {
@@ -25,8 +54,6 @@ async function uploadFile(req, res, next) {
     });
 
     if (!subCriterion) {
-      // Clean up temp file
-      if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
       return res.status(404).json({ success: false, message: 'Sub-criterion not found.' });
     }
 
@@ -34,10 +61,29 @@ async function uploadFile(req, res, next) {
       return res.status(400).json({ success: false, message: 'No file uploaded.' });
     }
 
-    // Move file from temp dir to structured path: /uploads/{teacher_id}/{C1}/{1.1}/
-    const destDir = getUploadDir(req.user.id, subCriteriaCode);
-    const destPath = path.join(destDir, req.file.filename);
-    fs.renameSync(req.file.path, destPath);
+    let storedFilename, filePath, fileSize;
+
+    if (isCloudinaryEnabled()) {
+      // Cloudinary: upload buffer from memory storage
+      const folder = getCloudinaryFolder(req.user.id, subCriteriaCode);
+      const result = await uploadToCloudinary(req.file.buffer, folder, req.file.originalname);
+      storedFilename = result.public_id;   // Full Cloudinary public_id (includes folder)
+      filePath = result.secure_url;         // Cloudinary HTTPS URL
+      fileSize = result.bytes || req.file.size;
+    } else {
+      // Disk: move file from temp dir to structured path
+      const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
+      const criteriaCode = subCriteriaCode.split('.')[0];
+      const destDir = path.join(UPLOAD_DIR, req.user.id, `C${criteriaCode}`, subCriteriaCode);
+      if (!fs.existsSync(destDir)) {
+        fs.mkdirSync(destDir, { recursive: true });
+      }
+      const destPath = path.join(destDir, req.file.filename);
+      fs.renameSync(req.file.path, destPath);
+      storedFilename = req.file.filename;
+      filePath = destPath;
+      fileSize = req.file.size;
+    }
 
     // Find existing form submission to link
     const submission = await prisma.formSubmission.findFirst({
@@ -50,10 +96,10 @@ async function uploadFile(req, res, next) {
         subCriteriaId: subCriterion.id,
         formSubmissionId: submission?.id || null,
         originalFilename: req.file.originalname,
-        storedFilename: req.file.filename,
-        filePath: destPath,
+        storedFilename,
+        filePath,
         fileType: path.extname(req.file.originalname).replace('.', '').toLowerCase(),
-        fileSize: req.file.size,
+        fileSize,
         uploadStatus: 'uploaded',
       },
     });
@@ -81,17 +127,15 @@ async function uploadFile(req, res, next) {
       },
     });
   } catch (error) {
-    // Clean up temp file on error
-    if (req.file && fs.existsSync(req.file.path)) {
-      try { fs.unlinkSync(req.file.path); } catch {}
-    }
     next(error);
   }
 }
 
 /**
  * GET /api/upload/:id/download
- * Securely stream file as attachment. Teacher=own files, HOD=any.
+ * Download file as attachment.
+ * - Cloudinary: redirect to Cloudinary URL with fl_attachment flag.
+ * - Disk: stream file from disk.
  */
 async function downloadFile(req, res, next) {
   try {
@@ -108,11 +152,6 @@ async function downloadFile(req, res, next) {
       return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
-    const filePath = path.resolve(document.filePath);
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ success: false, message: 'File not found on disk.' });
-    }
-
     // Log download
     await prisma.activityLog.create({
       data: {
@@ -123,6 +162,18 @@ async function downloadFile(req, res, next) {
         description: `Downloaded ${document.originalFilename}`,
       },
     });
+
+    if (isCloudinaryEnabled()) {
+      // Redirect to Cloudinary URL with attachment flag for download
+      const downloadUrl = document.filePath.replace('/upload/', '/upload/fl_attachment/');
+      return res.redirect(downloadUrl);
+    }
+
+    // Disk: stream file
+    const filePath = path.resolve(document.filePath);
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ success: false, message: 'File not found on disk.' });
+    }
 
     res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(document.originalFilename)}"`);
     const contentType = MIME_TO_CONTENT_TYPE[document.fileType] || 'application/octet-stream';
@@ -137,7 +188,9 @@ async function downloadFile(req, res, next) {
 
 /**
  * GET /api/upload/:id/view
- * Securely stream file inline (for in-browser PDF/image viewing).
+ * View file inline (for in-browser PDF/image viewing).
+ * - Cloudinary: redirect to Cloudinary URL.
+ * - Disk: stream file inline.
  */
 async function viewFile(req, res, next) {
   try {
@@ -153,6 +206,12 @@ async function viewFile(req, res, next) {
       return res.status(403).json({ success: false, message: 'Access denied.' });
     }
 
+    if (isCloudinaryEnabled()) {
+      // Redirect to Cloudinary URL for inline viewing
+      return res.redirect(document.filePath);
+    }
+
+    // Disk: stream file inline
     const filePath = path.resolve(document.filePath);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ success: false, message: 'File not found on disk.' });
@@ -172,6 +231,8 @@ async function viewFile(req, res, next) {
 /**
  * DELETE /api/upload/:id
  * Delete file. Teacher=own only, cannot delete if verified.
+ * - Cloudinary: destroy asset via Cloudinary API.
+ * - Disk: unlink from filesystem.
  */
 async function deleteFile(req, res, next) {
   try {
@@ -198,10 +259,19 @@ async function deleteFile(req, res, next) {
       });
     }
 
-    // Delete from disk
-    const filePath = path.resolve(document.filePath);
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
+    // Delete the actual file
+    if (isCloudinaryEnabled()) {
+      const cloudinary = require('../config/cloudinary');
+      try {
+        await cloudinary.uploader.destroy(document.storedFilename, { resource_type: 'raw' });
+      } catch (cloudErr) {
+        console.error('Warning: Cloudinary delete failed:', cloudErr.message);
+      }
+    } else {
+      const filePath = path.resolve(document.filePath);
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath);
+      }
     }
 
     // Delete from DB

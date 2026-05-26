@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.local
 .env.*.local
+server/.env
 
 # Embedded PostgreSQL data
 server/.pg-data/
@@ -41,9 +42,10 @@ server/uploads/*
 # Coverage
 coverage/
 
-# Prisma
-server/prisma/migrations/
-
 # Temporary files
 *.tmp
 *.temp
+
+# Vercel
+.vercel
+

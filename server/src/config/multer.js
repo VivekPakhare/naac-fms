@@ -1,15 +1,8 @@
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 const { v4: uuidv4 } = require('uuid');
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
 const MAX_FILE_SIZE = (parseInt(process.env.MAX_FILE_SIZE_MB, 10) || 10) * 1024 * 1024;
-
-// Ensure upload directory exists
-if (!fs.existsSync(UPLOAD_DIR)) {
-  fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-}
 
 // Allowed MIME types for NAAC documents — validated against BOTH mime and extension
 const ALLOWED_MIME_TYPES = {
@@ -22,33 +15,13 @@ const ALLOWED_MIME_TYPES = {
 const ALLOWED_EXTENSIONS = new Set(['.pdf', '.jpg', '.jpeg', '.png', '.docx']);
 
 /**
- * Build per-teacher/criteria directory path.
- * Format: /uploads/{teacher_id}/{criteria_code}/{sub_criteria_code}/
+ * Build Cloudinary folder path per teacher/criteria.
+ * Format: naac-fms/{teacher_id}/{criteria_code}/{sub_criteria_code}
  */
-function getUploadDir(teacherId, subCriteriaCode) {
+function getCloudinaryFolder(teacherId, subCriteriaCode) {
   const criteriaCode = subCriteriaCode.split('.')[0];
-  const dir = path.join(UPLOAD_DIR, teacherId, `C${criteriaCode}`, subCriteriaCode);
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-  return dir;
+  return `naac-fms/${teacherId}/C${criteriaCode}/${subCriteriaCode}`;
 }
-
-const storage = multer.diskStorage({
-  destination: (req, _file, cb) => {
-    // Use a temporary upload dir first, we'll move it in the controller
-    const tmpDir = path.join(UPLOAD_DIR, '_tmp');
-    if (!fs.existsSync(tmpDir)) {
-      fs.mkdirSync(tmpDir, { recursive: true });
-    }
-    cb(null, tmpDir);
-  },
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    // Store as UUID.extension — never expose original filename
-    cb(null, `${uuidv4()}${ext}`);
-  },
-});
 
 /**
  * File filter: validates BOTH MIME type AND file extension.
@@ -76,6 +49,44 @@ const fileFilter = (_req, file, cb) => {
   cb(null, true);
 };
 
+// ── Storage Strategy ─────────────────────────────────────────
+// Use memory storage on Vercel (files are uploaded to Cloudinary in the controller).
+// Use disk storage for local development.
+
+let storage;
+
+if (process.env.CLOUDINARY_CLOUD_NAME) {
+  // ── Memory Storage (Vercel/Cloudinary) ───────────────────
+  // Files are buffered in memory and then uploaded to Cloudinary
+  // in the upload controller. This avoids the multer-storage-cloudinary
+  // peer dependency conflict with cloudinary v2.
+  storage = multer.memoryStorage();
+} else {
+  // ── Disk Storage (local dev fallback) ────────────────────
+  const fs = require('fs');
+
+  const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
+
+  // Ensure upload directory exists
+  if (!fs.existsSync(UPLOAD_DIR)) {
+    fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+  }
+
+  storage = multer.diskStorage({
+    destination: (_req, _file, cb) => {
+      const tmpDir = path.join(UPLOAD_DIR, '_tmp');
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+      cb(null, tmpDir);
+    },
+    filename: (_req, file, cb) => {
+      const ext = path.extname(file.originalname).toLowerCase();
+      cb(null, `${uuidv4()}${ext}`);
+    },
+  });
+}
+
 const upload = multer({
   storage,
   fileFilter,
@@ -84,4 +95,18 @@ const upload = multer({
   },
 });
 
-module.exports = { upload, UPLOAD_DIR, ALLOWED_MIME_TYPES, ALLOWED_EXTENSIONS, getUploadDir, MAX_FILE_SIZE };
+/**
+ * Check if Cloudinary is being used for storage.
+ */
+function isCloudinaryEnabled() {
+  return !!process.env.CLOUDINARY_CLOUD_NAME;
+}
+
+module.exports = {
+  upload,
+  ALLOWED_MIME_TYPES,
+  ALLOWED_EXTENSIONS,
+  getCloudinaryFolder,
+  MAX_FILE_SIZE,
+  isCloudinaryEnabled,
+};

@@ -1,12 +1,23 @@
 const { PrismaClient } = require('@prisma/client');
 
-const prisma = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
-});
+// ── Singleton Pattern for Serverless ─────────────────────────
+// Prevents connection exhaustion on Vercel where each hot invocation
+// would otherwise create a new PrismaClient instance.
+const globalForPrisma = globalThis;
+
+const prisma =
+  globalForPrisma.__prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === 'development' ? ['query', 'info', 'warn', 'error'] : ['error'],
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.__prisma = prisma;
+}
 
 /**
  * Connect to the PostgreSQL database via Prisma.
- * Exits the process if connection fails.
+ * In production (Vercel), Prisma lazy-connects automatically.
  */
 async function connectDB() {
   try {
@@ -14,7 +25,10 @@ async function connectDB() {
     console.log('✅ PostgreSQL connected via Prisma');
   } catch (error) {
     console.error('❌ Database connection failed:', error.message);
-    process.exit(1);
+    // Don't exit on Vercel — let it retry on next invocation
+    if (!process.env.VERCEL) {
+      process.exit(1);
+    }
   }
 }
 
@@ -26,15 +40,17 @@ async function disconnectDB() {
   console.log('🔌 Database disconnected');
 }
 
-// Graceful shutdown handlers
-process.on('SIGINT', async () => {
-  await disconnectDB();
-  process.exit(0);
-});
+// Graceful shutdown handlers (local dev only)
+if (!process.env.VERCEL) {
+  process.on('SIGINT', async () => {
+    await disconnectDB();
+    process.exit(0);
+  });
 
-process.on('SIGTERM', async () => {
-  await disconnectDB();
-  process.exit(0);
-});
+  process.on('SIGTERM', async () => {
+    await disconnectDB();
+    process.exit(0);
+  });
+}
 
 module.exports = { prisma, connectDB, disconnectDB };
