@@ -17,6 +17,7 @@ const transporter = nodemailer.createTransport({
 /**
  * Default "from" address for all outgoing emails.
  */
-const MAIL_FROM = process.env.SMTP_FROM || 'NAAC FMS <noreply@naac.edu>';
+const MAIL_FROM = process.env.SMTP_FROM || 'college accreditation & document workflow platform <noreply@naac.edu>';
 
 module.exports = { transporter, MAIL_FROM };
+

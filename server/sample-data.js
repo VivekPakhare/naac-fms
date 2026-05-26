@@ -1,5 +1,5 @@
 /**
- * NAAC FMS — Sample Data Generator
+ * college accreditation & document workflow platform — Sample Data Generator
  * Populates the system with realistic demo data for judges.
  * 
  * Usage: node sample-data.js
@@ -117,7 +117,7 @@ const SAMPLE_FORMS = {
 };
 
 async function run() {
-  console.log('\n=== NAAC FMS Sample Data Generator ===\n');
+  console.log('\n=== college accreditation & document workflow platform Sample Data Generator ===\n');
 
   // Login as HOD
   let r = await req('POST', '/auth/login', { email: 'hod@naac.edu', password: 'HOD@2024' });
@@ -218,3 +218,4 @@ run().catch((e) => {
   console.error('Error:', e.message);
   process.exit(1);
 });
+

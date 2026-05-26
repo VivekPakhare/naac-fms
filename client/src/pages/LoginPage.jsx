@@ -157,10 +157,10 @@ export default function LoginPage() {
           <div className="relative z-10 max-w-lg">
             <div className="flex items-center gap-3 mb-8">
               <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                <span className="text-white font-bold text-lg">N</span>
+                <span className="text-white font-bold text-[10px] tracking-wide leading-none">CAD-WP</span>
               </div>
               <div>
-                <h2 className="text-white font-bold text-xl tracking-tight">NAAC FMS</h2>
+                <h2 className="text-white font-bold text-xl tracking-tight">college accreditation & document workflow platform</h2>
                 <p className="text-indigo-300 text-xs">Password Recovery</p>
               </div>
             </div>
@@ -446,10 +446,10 @@ export default function LoginPage() {
         <div className="relative z-10 max-w-lg">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-              <span className="text-white font-bold text-lg">N</span>
+              <span className="text-white font-bold text-[10px] tracking-wide leading-none">CAD-WP</span>
             </div>
             <div>
-              <h2 className="text-white font-bold text-xl tracking-tight">NAAC FMS</h2>
+              <h2 className="text-white font-bold text-xl tracking-tight">college accreditation & document workflow platform</h2>
               <p className="text-indigo-300 text-xs">File Management System</p>
             </div>
           </div>
@@ -491,9 +491,9 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="lg:hidden flex items-center gap-3 mb-8">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-              <span className="text-white font-bold">N</span>
+              <span className="text-white font-bold text-[9px] tracking-wide leading-none">CAD-WP</span>
             </div>
-            <h2 className="text-white font-bold text-lg">NAAC FMS</h2>
+            <h2 className="text-white font-bold text-lg">college accreditation & document workflow platform</h2>
           </div>
 
           <h2 className="text-2xl font-bold text-white mb-2">Welcome back</h2>
@@ -610,3 +610,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

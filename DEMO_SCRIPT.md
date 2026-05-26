@@ -1,4 +1,4 @@
-# NAAC FMS — Demo Script (5 Minutes)
+# college accreditation & document workflow platform — Demo Script (5 Minutes)
 
 > Video walkthrough script for judges. Each section is timed to fit a 5-minute demo.
 
@@ -78,7 +78,7 @@
    - Review decisions
    - Notification dispatches"
 4. **Show filter options** — Filter by user, action type, date range
-5. **Closing statement**: "The NAAC FMS provides a complete, secure, role-based workflow for NAAC accreditation data collection, review, and export — all with a modern, responsive UI and comprehensive audit trail."
+5. **Closing statement**: "The college accreditation & document workflow platform provides a complete, secure, role-based workflow for NAAC accreditation data collection, review, and export — all with a modern, responsive UI and comprehensive audit trail."
 
 ---
 
@@ -94,3 +94,4 @@
 | Export system | Excel + PDF generation |
 | Audit trail | Activity logs with timestamps |
 | Responsive design | Resize browser to show mobile layout |
+

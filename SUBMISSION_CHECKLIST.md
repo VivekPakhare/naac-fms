@@ -1,4 +1,4 @@
-# NAAC FMS — Submission Checklist
+# college accreditation & document workflow platform — Submission Checklist
 
 > Project deliverables checklist based on Section 13 requirements.
 
@@ -86,3 +86,4 @@
 - [x] **SUBMISSION_CHECKLIST.md** — This file
 - [x] **Code Comments** — Documented controllers and middleware
 - [x] **Seed Data** — SQL + JS seeders for immediate demo readiness
+

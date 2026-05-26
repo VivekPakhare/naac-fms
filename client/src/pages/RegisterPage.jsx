@@ -150,7 +150,7 @@ export default function RegisterPage() {
                 <span className="text-white font-bold text-lg">N</span>
               </div>
               <div>
-                <h2 className="text-white font-bold text-xl tracking-tight">NAAC FMS</h2>
+                <h2 className="text-white font-bold text-xl tracking-tight">college accreditation & document workflow platform</h2>
                 <p className="text-emerald-300 text-xs">Email Verification</p>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function RegisterPage() {
               <span className="text-white font-bold text-lg">N</span>
             </div>
             <div>
-              <h2 className="text-white font-bold text-xl tracking-tight">NAAC FMS</h2>
+              <h2 className="text-white font-bold text-xl tracking-tight">college accreditation & document workflow platform</h2>
               <p className="text-emerald-300 text-xs">Teacher Registration</p>
             </div>
           </div>
@@ -520,3 +520,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+

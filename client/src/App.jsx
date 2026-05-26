@@ -21,7 +21,7 @@ function HomeRedirect() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#F8F9FF' }}>
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-[#003580] border-t-transparent rounded-full animate-spin" />
-          <span className="text-sm text-slate-500 font-medium">Loading NAAC FMS...</span>
+          <span className="text-sm text-slate-500 font-medium">Loading college accreditation & document workflow platform...</span>
         </div>
       </div>
     );
@@ -100,3 +100,4 @@ export default function App() {
     </Routes>
   )
 }
+
