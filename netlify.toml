@@ -1,8 +1,18 @@
 [build]
-  base = "client"
-  command = "npm run build"
-  publish = "dist"
+  command = "npm install && cd server && npm install && cd ../client && npm install && npm run build"
+  publish = "client/dist"
+  functions = "netlify/functions"
 
+[build.environment]
+  NODE_VERSION = "20"
+
+# Route /api/* requests to the serverless function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+
+# Route all other requests to the React SPA (client routing fallback)
 [[redirects]]
   from = "/*"
   to = "/index.html"
